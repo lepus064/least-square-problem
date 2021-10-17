@@ -72,16 +72,7 @@ if __name__ == '__main__':
         print("time: ", time_cost[-1])
         test_result.append(current_para.copy())
 
-    # print("result difference:\n", np.abs(test_result[0] - test_result[1]))
-    # print(current_para)
-    # print(time_cost)
-    # y_ = test_func(curve_x, current_para)
-
     # plotting
-
-    # plt.show()
-
-    # fig = plt.figure()
     ims_names = []
     current_para_name = ['initial guess']+['current parameters' for _ in params_record]
     text_x = 270
@@ -107,8 +98,9 @@ if __name__ == '__main__':
         plt.close()
 
     ims_names = [ims_names[0]]+ims_names
+    
     # Build GIF
-    with imageio.get_writer('mygif.gif', mode='I', duration=0.5) as writer:
+    with imageio.get_writer('example.gif', mode='I', duration=0.5) as writer:
         for filename in ims_names:
             image = imageio.imread(filename)
             writer.append_data(image)
