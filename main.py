@@ -1,8 +1,9 @@
-from time import time
+from time import perf_counter
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import scipy.linalg
+from scipy.optimize import least_squares
 import autograd.numpy as np
 from autograd import jacobian
 import imageio
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     # Jacobian 200, 3
     # Hessian 3, 3
 
-    # test_functions = [manual_J, auto_J]
+    # test_functions = [auto_J]
     test_functions = [manual_J]
     test_result = []
     time_cost = []
@@ -53,11 +54,14 @@ if __name__ == '__main__':
     residual_record = []
 
     for jacobian_func in test_functions:
-        current_para = initial_guess
-        start_time = time()
+        current_para = initial_guess.copy()
+        start_time = perf_counter()
         for iter in range(iter_time):
+            print(iter)
             residual = vector_func(current_para)
+            
             residual_record.append(np.linalg.norm(residual))
+            print(residual_record[-1])
             Jx = jacobian_func(current_para)
 
             H = Jx.T @ Jx
@@ -68,9 +72,17 @@ if __name__ == '__main__':
             current_para += dx
             params_record.append(current_para.copy())
 
-        time_cost.append(time() - start_time)
+        time_cost.append(perf_counter() - start_time)
         print("time: ", time_cost[-1])
         test_result.append(current_para.copy())
+    # scipy
+    current_para = initial_guess.copy()
+    start_time = perf_counter()
+    res = least_squares(vector_func, current_para)
+    time_cost.append(perf_counter() - start_time)
+    print("time: ", time_cost[-1])
+
+    # exit(0)
 
     # plotting
     ims_names = []
