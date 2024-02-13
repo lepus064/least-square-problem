@@ -12,12 +12,23 @@ p3d = np.random.random((3, 2))
 
 def f(rvec):
     m = Rotation.from_rotvec(rvec).as_matrix()
-    return ((m @ p3d) - (rmat_gt @ p3d)).flatten()
+    return ((m @ p3d) - (rmat_gt @ p3d)).T.flatten()
 
 def hat(rvec):
     return np.array([[0, -rvec[2], rvec[1]],
                      [rvec[2], 0, -rvec[0]],
                      [-rvec[1], rvec[0], 0]])
+def hat_multi(rvec: np.ndarray):
+    _, dimension = rvec.reshape(3, -1).shape
+    h = np.zeros((3, 3, dimension))
+    h[2, 1] = rvec[0]
+    h[0, 2] = rvec[1]
+    h[1, 0] = rvec[2]
+    h[1, 2] = -rvec[0]
+    h[2, 0] = -rvec[1]
+    h[0, 1] = -rvec[2]
+    hts = np.dsplit(h, dimension)
+    return np.vstack(hts).squeeze(axis=2)
 
 def rodrigues(rvec):
     rhat = hat(rvec)
@@ -55,11 +66,11 @@ if __name__ == '__main__':
         # print("r", rmat_noise)
         # print(rodrigues(rvec_noise))
         # exit()
-        Rs0 = rmat_noise@p3d[:,0]
-        jj0 = -hat(Rs0) @ jacobian_l(rvec_noise)
-        Rs1 = rmat_noise@p3d[:,1]
-        jj1 = -hat(Rs1) @ jacobian_l(rvec_noise)
-        j = np.hstack((jj0, jj1)).reshape(-1, 3)
+        Rs = rmat_noise@p3d
+        j = -hat_multi(Rs) @ jacobian_l(rvec_noise)
+        # Rs1 = rmat_noise@p3d[:,1]
+        # jj1 = -hat(Rs1) @ jacobian_l(rvec_noise)
+        # j = np.vstack((jj0, jj1))
         print(j-Jx)
         # rr = -rmat_noise @ p3d
         # print(rr)
