@@ -16,7 +16,7 @@ def cost_function(rvec: np.ndarray):
     return ((rotation_matrix @ p3d) - rotated_3d_points).T.flatten()
 
 
-def hat(rvec):
+def hat(rvec: np.ndarray):
     return np.array([[0, -rvec[2], rvec[1]],
                      [rvec[2], 0, -rvec[0]],
                      [-rvec[1], rvec[0], 0]])
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
         Jx_numerical = diff_3point((residual.size, 3), cost_function, rvec_noise)
         print(f"Jx numerical: {Jx_numerical.shape}\n{Jx_numerical}")
-        rmat_noise = Rotation.from_rotvec(rvec_noise).as_matrix()
+        rmat_noise = rodrigues(rvec_noise)
 
         Rs = rmat_noise @ p3d
         Jx_analytic = -hat_multi(Rs) @ jacobian_l(rvec_noise)
